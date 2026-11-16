@@ -1,36 +1,441 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>มึงโดนบิดรหัส</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f4f4f4;
-            margin: 0;
-        }
-        button {
-            padding: 15px 30px;
-            font-size: 20px;
-            cursor: pointer;
-            background-color: #ff4d4d;
-            border: none;
-            color: white;
-            border-radius: 5px;
-            box-shadow: 0 5px #b30000;
-        }
-        button:active {
-            box-shadow: none;
-            transform: translateY(4px);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="หน้าเว็บควบคุมและมอนิเตอร์สถานะซิงค์กับสคริปต์ Roblox" />
+  <title>POR HUB — Roblox Web Controller</title>
+  <style>
+    :root {
+      --bg: #090a0d;
+      --panel: #101115;
+      --surface: #18191e;
+      --surface-light: #23252e;
+      --gold: #c39e5b;
+      --gold-bright: #e6ca93;
+      --gold-dark: #77592b;
+      --text: #f3f0e9;
+      --muted: #87888f;
+      --green: #69be91;
+      --red: #ce6464;
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Noto Sans Thai", system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .wrap {
+      max-width: 1040px;
+      margin: 0 auto;
+      display: grid;
+      gap: 16px;
+    }
+
+    header.topbar {
+      background: var(--panel);
+      border: 1px solid var(--gold-dark);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .brand-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-row h1 {
+      font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+      color: var(--gold-bright);
+    }
+
+    .brand-row span {
+      font-size: 0.85rem;
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    .endpoint-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .endpoint-row input {
+      flex: 1 1 260px;
+    }
+
+    input, select, textarea {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--gold-dark);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      min-height: 44px;
+      width: 100%;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: 2px solid var(--gold);
+      border-color: var(--gold-bright);
+    }
+
+    button {
+      background: var(--gold-dark);
+      color: var(--text);
+      border: 1px solid var(--gold);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      min-height: 44px;
+      min-width: 44px;
+      transition: background 0.16s ease, color 0.16s ease;
+    }
+
+    button:hover {
+      background: var(--gold);
+      color: #090a0d;
+    }
+
+    button.ghost {
+      background: var(--surface-light);
+      border-color: var(--muted);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 720px) {
+      .cards {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    article.card {
+      background: var(--panel);
+      border: 1px solid rgba(119, 89, 43, 0.55);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+
+    article.card h2 {
+      font-size: 0.85rem;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+
+    .card-main {
+      font-size: 1rem;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .card-sub {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .panels {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 860px) {
+      .panels {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    section.panel {
+      background: var(--panel);
+      border: 1px solid var(--gold-dark);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    section.panel h2 {
+      font-size: 1rem;
+      color: var(--gold-bright);
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .log {
+      background: var(--surface);
+      border: 1px solid rgba(135, 136, 143, 0.35);
+      border-radius: 8px;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 0.8rem;
+      max-height: 190px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+  </style>
 </head>
 <body>
-    <button onclick="alert('มึงโดนบิดรหัสแล้วไอควาย')">คลิกกูดิ</button>
+  <main class="wrap">
+    <header class="topbar">
+      <div class="brand-row">
+        <h1>POR HUB — Roblox Web Controller</h1>
+        <span id="connStatus">READY</span>
+      </div>
+      <div class="endpoint-row">
+        <label for="relayInput" class="field" style="flex: 1 1 260px;">
+          <span style="font-size: 0.8rem; color: var(--muted);">Relay Endpoint URL</span>
+          <input id="relayInput" type="url" placeholder="http://127.0.0.1:8787/sync" />
+        </label>
+        <div class="actions" style="align-items: flex-end;">
+          <button id="btnPull" type="button">ดึงสถานะ</button>
+          <button id="btnPush" type="button">ส่งคำสั่ง</button>
+          <button id="btnPoll" class="ghost" type="button">Auto Poll: OFF</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="cards" aria-label="สถานะเกมเรียลไทม์">
+      <article class="card">
+        <h2>กำลังทำอะไรอยู่</h2>
+        <div class="card-main" id="outActivity">รอรับข้อมูลจาก Roblox</div>
+        <div class="card-sub" id="outUpdated">อัปเดตล่าสุด: -</div>
+      </article>
+      <article class="card">
+        <h2>หมัดที่มี / ความครบ</h2>
+        <div class="card-main" id="outFists">-</div>
+        <div class="card-sub" id="outFistCheck">เช็คความครบ: -</div>
+      </article>
+      <article class="card">
+        <h2>ผลไม้ & ของในตัว</h2>
+        <div class="card-main" id="outFruits">-</div>
+        <div class="card-sub" id="outInventory">ของในตัว: -</div>
+      </article>
+    </section>
+
+    <section class="panels">
+      <section class="panel" aria-label="ควบคุมคำสั่งส่งไป Roblox">
+        <h2>ส่งคำสั่งควบคุมไปให้ Roblox</h2>
+        <div class="field">
+          <label for="modeSelect">โหมดการทำงาน</label>
+          <select id="modeSelect">
+            <option value="idle">Idle / Stand By</option>
+            <option value="auto_collect_fruit">Auto Collect Fruit</option>
+            <option value="bring_fruit">Bring Fruit to Player</option>
+            <option value="farm_loop">Farm Loop</option>
+            <option value="pause">Pause</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="speedInput">FlySpeed</label>
+          <input id="speedInput" type="number" min="10" max="500" value="140" />
+        </div>
+        <div class="field">
+          <label for="noteInput">คำสั่งเพิ่มเติม</label>
+          <input id="noteInput" type="text" placeholder="ระบุเป้าหมายหรือเงื่อนไขเพิ่มเติม" />
+        </div>
+        <div class="actions">
+          <button id="btnCopyCmd" class="ghost" type="button">คัดลอก JSON คำสั่ง</button>
+        </div>
+      </section>
+
+      <section class="panel" aria-label="รับข้อมูล JSON จาก Roblox">
+        <h2>วางข้อมูล JSON จากสคริปต์ Roblox</h2>
+        <div class="field">
+          <label for="jsonInput">วาง Payload JSON แล้วกด Apply</label>
+          <textarea id="jsonInput" rows="4" placeholder='{"activity":"Farming","fists":["Combat"],"missingFists":[],"fruitsInBag":["Flame Fruit"],"fruitsInMap":[],"inventory":["Flame Fruit"]}'></textarea>
+        </div>
+        <div class="actions">
+          <button id="btnApply" type="button">Apply JSON</button>
+          <button id="btnClear" class="ghost" type="button">ล้าง Log</button>
+        </div>
+        <div class="log" id="logBox">พร้อมใช้งาน — วาง JSON หรือตั้งค่า Relay Endpoint</div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const state = {
+      polling: false,
+      timer: null
+    };
+
+    const ui = {
+      connStatus: document.getElementById("connStatus"),
+      relayInput: document.getElementById("relayInput"),
+      btnPull: document.getElementById("btnPull"),
+      btnPush: document.getElementById("btnPush"),
+      btnPoll: document.getElementById("btnPoll"),
+      outActivity: document.getElementById("outActivity"),
+      outUpdated: document.getElementById("outUpdated"),
+      outFists: document.getElementById("outFists"),
+      outFistCheck: document.getElementById("outFistCheck"),
+      outFruits: document.getElementById("outFruits"),
+      outInventory: document.getElementById("outInventory"),
+      modeSelect: document.getElementById("modeSelect"),
+      speedInput: document.getElementById("speedInput"),
+      noteInput: document.getElementById("noteInput"),
+      btnCopyCmd: document.getElementById("btnCopyCmd"),
+      jsonInput: document.getElementById("jsonInput"),
+      btnApply: document.getElementById("btnApply"),
+      btnClear: document.getElementById("btnClear"),
+      logBox: document.getElementById("logBox")
+    };
+
+    function writeLog(text) {
+      const now = new Date().toLocaleTimeString("th-TH", { hour12: false });
+      ui.logBox.textContent = `[${now}] ${text}\n` + ui.logBox.textContent;
+    }
+
+    function applyTelemetry(data) {
+      if (!data || typeof data !== "object") {
+        writeLog("ข้อมูลไม่ถูกต้อง");
+        return;
+      }
+
+      ui.outActivity.textContent = String(data.activity || "ไม่ระบุสถานะ");
+      ui.outUpdated.textContent = "อัปเดตล่าสุด: " + new Date().toLocaleTimeString("th-TH");
+
+      const fists = Array.isArray(data.fists) ? data.fists : [];
+      const missing = Array.isArray(data.missingFists) ? data.missingFists : [];
+      ui.outFists.textContent = fists.length ? fists.join(", ") : "ไม่มีหมัดในตัว";
+      ui.outFistCheck.textContent = missing.length === 0
+        ? "เช็คความครบ: ครบแล้ว"
+        : `เช็คความครบ: ขาด ${missing.length} อย่าง (${missing.join(", ")})`;
+
+      const bagFruits = Array.isArray(data.fruitsInBag) ? data.fruitsInBag : [];
+      const mapFruits = Array.isArray(data.fruitsInMap) ? data.fruitsInMap : [];
+      const inv = Array.isArray(data.inventory) ? data.inventory : [];
+
+      ui.outFruits.textContent = bagFruits.length ? bagFruits.join(", ") : "ไม่มีผลในตัว";
+      ui.outInventory.textContent = `ในแมพ: ${mapFruits.length ? mapFruits.join(", ") : "-"} | ของในตัว: ${inv.length ? inv.join(", ") : "-"}`;
+
+      writeLog("อัปเดตสถานะหน้าเว็บเรียบร้อย");
+    }
+
+    function makeCommand() {
+      const spd = Number(ui.speedInput.value);
+      return {
+        mode: ui.modeSelect.value,
+        flySpeed: Number.isFinite(spd) ? Math.min(Math.max(spd, 10), 500) : 140,
+        note: String(ui.noteInput.value || "").trim(),
+        sentAt: new Date().toISOString()
+      };
+    }
+
+    ui.btnApply.addEventListener("click", () => {
+      try {
+        const parsed = JSON.parse(ui.jsonInput.value);
+        applyTelemetry(parsed);
+      } catch (err) {
+        writeLog("JSON ผิดรูปแบบ: " + err.message);
+      }
+    });
+
+    ui.btnCopyCmd.addEventListener("click", async () => {
+      const payload = JSON.stringify(makeCommand(), null, 2);
+      try {
+        await navigator.clipboard.writeText(payload);
+        writeLog("คัดลอก JSON คำสั่งแล้ว");
+      } catch {
+        writeLog("คัดลอกไม่ได้ — Payload: " + payload);
+      }
+    });
+
+    ui.btnPull.addEventListener("click", async () => {
+      const endpoint = ui.relayInput.value.trim();
+      if (!endpoint) {
+        writeLog("ยังไม่ได้ใส่ Relay Endpoint URL");
+        return;
+      }
+      try {
+        const res = await fetch(endpoint, { method: "GET" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        applyTelemetry(data);
+        ui.connStatus.textContent = "SYNCED";
+      } catch (err) {
+        ui.connStatus.textContent = "OFFLINE";
+        writeLog("ดึงสถานะล้มเหลว: " + err.message);
+      }
+    });
+
+    ui.btnPush.addEventListener("click", async () => {
+      const endpoint = ui.relayInput.value.trim();
+      const payload = makeCommand();
+      if (!endpoint) {
+        writeLog("ยังไม่ได้ใส่ Relay Endpoint URL");
+        return;
+      }
+      try {
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        writeLog("ส่งคำสั่งสำเร็จ: " + JSON.stringify(payload));
+      } catch (err) {
+        writeLog("ส่งคำสั่งล้มเหลว: " + err.message);
+      }
+    });
+
+    ui.btnPoll.addEventListener("click", () => {
+      state.polling = !state.polling;
+      ui.btnPoll.textContent = "Auto Poll: " + (state.polling ? "ON" : "OFF");
+      if (state.timer) {
+        clearInterval(state.timer);
+        state.timer = null;
+      }
+      if (state.polling) {
+        state.timer = setInterval(() => ui.btnPull.click(), 2000);
+        writeLog("เปิด Auto Poll ทุก 2 วินาที");
+      } else {
+        writeLog("ปิด Auto Poll แล้ว");
+      }
+    });
+
+    ui.btnClear.addEventListener("click", () => {
+      ui.logBox.textContent = "";
+    });
+  </script>
 </body>
 </html>
